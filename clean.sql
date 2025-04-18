@@ -17,7 +17,7 @@ SELECT
     NULLIF(jsonb->'data'->>'chapters', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'volume', 'null')::INTEGER,
     NULLIF(jsonb->'data'->'published'->>'from', 'null')::DATE,
-    NULLIF(jsonb->'data'->'published'->>'to', 'null')::DATE,
+    NULLIF(jsonb->'data'->'published'->>'to', 'null')::DATE
 FROM manga_data
 WHERE jsonb->'data'->>'mal_id' IS NOT NULL
 ON CONFLICT (manga_id) DO UPDATE SET
