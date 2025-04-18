@@ -3,7 +3,7 @@ START TRANSACTION;
 -- Insert/Update Anime
 INSERT INTO manga (
     manga_id, title, english_title, japanese_title, synopsis, 
-    rank, score, status, chapters, volumes, date_published, 
+    rank, score, scored_by, popularity, favorites, status, chapters, volumes, date_published, 
     date_ended
 )
 SELECT
@@ -14,6 +14,9 @@ SELECT
     jsonb->'data'->>'synopsis',
     NULLIF(jsonb->'data'->>'rank', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'score', 'null')::FLOAT,
+    NULLIF(jsonb->'data'->>'scored_by', 'null')::INTEGER,
+    NULLIF(jsonb->'data'->>'popularity', 'null')::INTEGER,
+    NULLIF(jsonb->'data'->>'favorites', 'null')::INTEGER,
     jsonb->'data'->>'status',
     NULLIF(jsonb->'data'->>'chapters', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'volume', 'null')::INTEGER,
