@@ -3,7 +3,7 @@ START TRANSACTION;
 -- Insert/Update Anime
 INSERT INTO manga (
     manga_id, title, english_title, japanese_title, synopsis, 
-    rank, score, status, chapters, volumes, date_started, 
+    rank, score, status, chapters, volumes, date_published, 
     date_ended
 )
 SELECT
