@@ -30,7 +30,7 @@ ON CONFLICT (manga_id) DO UPDATE SET
     score = EXCLUDED.score,
     status = EXCLUDED.status,
     chapters = EXCLUDED.chapters,
-    volume = EXCLUDED.volume,
+    volumes = EXCLUDED.volumes,
     date_published = EXCLUDED.date_published,
     date_ended = EXCLUDED.date_ended;
 
