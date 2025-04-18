@@ -35,7 +35,7 @@ ON CONFLICT (manga_id) DO UPDATE SET
     date_ended = EXCLUDED.date_ended;
 
 -- Insert Genres
-INSERT INTO genre (genre_id, name)
+INSERT INTO genres (genre_id, name)
 SELECT DISTINCT
     (genre_element->>'mal_id')::INTEGER,
     genre_element->>'name'
