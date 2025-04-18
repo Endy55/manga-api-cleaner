@@ -11,6 +11,7 @@ SELECT
     jsonb->'data'->>'title',
     jsonb->'data'->>'title_english',
     jsonb->'data'->>'title_japanese',
+    jsonb->'data'->>'synopsis',
     NULLIF(jsonb->'data'->>'rank', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'score', 'null')::FLOAT,
     jsonb->'data'->>'status',
