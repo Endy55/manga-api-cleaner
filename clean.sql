@@ -1,16 +1,3 @@
-'title'
-'title_english'
-'title_japanese'
-'synopsis'
-'rank'
-'score'
-'status'
-'chapters'
-'volumes'
-'authors'
-'from'
-'to'
-
 START TRANSACTION;
 
 -- Insert/Update Anime
