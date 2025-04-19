@@ -2,40 +2,46 @@ START TRANSACTION;
 
 -- Insert/Update Anime
 INSERT INTO manga (
-    manga_id, title, english_title, japanese_title, synopsis, 
-    rank, score, scored_by, popularity, favorites, status, chapters, volumes, date_published, 
-    date_ended
+    manga_id, title, english_title, japanese_title, synopsis, date_published, 
+    date_ended, status, chapters, volumes, rank, score, scored_by, popularity, favorites, members
 )
-SELECT
-    (jsonb->'data'->>'mal_id')::INTEGER,
+SELECT DISTINCT ON ((jsonb->'data'->>'mal_id')::INTEGER)
+    (jsonb->'data'->>'mal_id')::INTEGER AS manga_id,
     jsonb->'data'->>'title',
     jsonb->'data'->>'title_english',
     jsonb->'data'->>'title_japanese',
     jsonb->'data'->>'synopsis',
+    NULLIF(jsonb->'data'->'published'->>'from', 'null')::DATE,
+    NULLIF(jsonb->'data'->'published'->>'to', 'null')::DATE,
+    jsonb->'data'->>'status',
+    NULLIF(jsonb->'data'->>'chapters', 'null')::INTEGER,
+    NULLIF(jsonb->'data'->>'volumes', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'rank', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'score', 'null')::FLOAT,
     NULLIF(jsonb->'data'->>'scored_by', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'popularity', 'null')::INTEGER,
     NULLIF(jsonb->'data'->>'favorites', 'null')::INTEGER,
-    jsonb->'data'->>'status',
-    NULLIF(jsonb->'data'->>'chapters', 'null')::INTEGER,
-    NULLIF(jsonb->'data'->>'volume', 'null')::INTEGER,
-    NULLIF(jsonb->'data'->'published'->>'from', 'null')::DATE,
-    NULLIF(jsonb->'data'->'published'->>'to', 'null')::DATE
+    NULLIF(jsonb->'data'->>'members', 'null')::INTEGER
 FROM manga_data
 WHERE jsonb->'data'->>'mal_id' IS NOT NULL
+ORDER BY manga_id, scraped_at DESC
 ON CONFLICT (manga_id) DO UPDATE SET
     title = EXCLUDED.title,
     english_title = EXCLUDED.english_title,
     japanese_title = EXCLUDED.japanese_title,
     synopsis = EXCLUDED.synopsis,
-    rank = EXCLUDED.rank,
-    score = EXCLUDED.score,
+    date_published = EXCLUDED.date_published,
+    date_ended = EXCLUDED.date_ended,
     status = EXCLUDED.status,
     chapters = EXCLUDED.chapters,
     volumes = EXCLUDED.volumes,
-    date_published = EXCLUDED.date_published,
-    date_ended = EXCLUDED.date_ended;
+    rank = EXCLUDED.rank,
+    score = EXCLUDED.score,
+    scored_by = EXCLUDED.scored_by,
+    popularity = EXCLUDED.popularity,
+    favorites = EXCLUDED.favorites,
+    members = EXCLUDED.members
+    ;
 
 -- Insert Genres
 INSERT INTO genres (genre_id, name)
