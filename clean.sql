@@ -1,8 +1,7 @@
 START TRANSACTION;
 
--- Insert/Update Anime
 INSERT INTO manga (
-    manga_id, title, english_title, japanese_title, synopsis, date_published, 
+    manga_id, title, english_title, japanese_title, synopsis, date_published,
     date_ended, status, chapters, volumes, rank, score, scored_by, popularity, favorites, members
 )
 SELECT DISTINCT ON ((jsonb->'data'->>'mal_id')::INTEGER)
@@ -43,7 +42,6 @@ ON CONFLICT (manga_id) DO UPDATE SET
     members = EXCLUDED.members
     ;
 
--- Insert Genres
 INSERT INTO genres (genre_id, name)
 SELECT DISTINCT
     (genre_element->>'mal_id')::INTEGER,
@@ -54,7 +52,7 @@ WHERE jsonb->'data'->>'mal_id' IS NOT NULL
   AND genre_element->>'mal_id' IS NOT NULL
 ON CONFLICT (genre_id) DO NOTHING;
 
--- Link Anime–Genres
+
 INSERT INTO manga_genre (manga_id, genre_id)
 SELECT
     (jsonb->'data'->>'mal_id')::INTEGER,
@@ -63,6 +61,30 @@ FROM manga_data,
      LATERAL jsonb_array_elements(jsonb->'data'->'genres') AS genre_element
 WHERE jsonb->'data'->>'mal_id' IS NOT NULL
   AND genre_element->>'mal_id' IS NOT NULL
+  AND (jsonb->'data'->>'mal_id')::BIGINT IN (SELECT manga_id FROM manga)
 ON CONFLICT (manga_id, genre_id) DO NOTHING;
+
+
+INSERT INTO authors (author_id, name)
+SELECT DISTINCT
+    (author_element->>'mal_id')::INTEGER,
+    author_element->>'name'
+FROM manga_data,
+     LATERAL jsonb_array_elements(jsonb->'data'->'authors') AS author_element
+WHERE jsonb->'data'->>'mal_id' IS NOT NULL
+  AND author_element->>'mal_id' IS NOT NULL
+ON CONFLICT (author_id) DO NOTHING;
+
+
+INSERT INTO manga_author (manga_id, author_id)
+SELECT
+    (jsonb->'data'->>'mal_id')::INTEGER,
+    (author_element->>'mal_id')::INTEGER
+FROM manga_data,
+     LATERAL jsonb_array_elements(jsonb->'data'->'authors') AS author_element
+WHERE jsonb->'data'->>'mal_id' IS NOT NULL
+  AND author_element->>'mal_id' IS NOT NULL
+  AND (jsonb->'data'->>'mal_id')::BIGINT IN (SELECT manga_id FROM manga)
+ON CONFLICT (manga_id, author_id) DO NOTHING;
 
 COMMIT;
