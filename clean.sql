@@ -65,26 +65,4 @@ WHERE jsonb->'data'->>'mal_id' IS NOT NULL
   AND genre_element->>'mal_id' IS NOT NULL
 ON CONFLICT (manga_id, genre_id) DO NOTHING;
 
--- Insert Studios
-INSERT INTO authors (author_id, name)
-SELECT DISTINCT
-    (author_element->>'mal_id')::INTEGER,
-    author_element->>'name'
-FROM manga_data,
-     LATERAL jsonb_array_elements(jsonb->'data'->'authors') AS author_element
-WHERE jsonb->'data'->>'mal_id' IS NOT NULL
-  AND author_element->>'mal_id' IS NOT NULL
-ON CONFLICT (author_id) DO NOTHING;
-
--- Link Anime–Studios
-INSERT INTO manga_author (manga_id, author_id)
-SELECT
-    (jsonb->'data'->>'mal_id')::INTEGER,
-    (author_element->>'mal_id')::INTEGER
-FROM manga_data,
-     LATERAL jsonb_array_elements(jsonb->'data'->'authors') AS author_element
-WHERE jsonb->'data'->>'mal_id' IS NOT NULL
-  AND author_element->>'mal_id' IS NOT NULL
-ON CONFLICT (manga_id, author_id) DO NOTHING;
-
 COMMIT;
